@@ -4,14 +4,16 @@ from http import HTTPStatus
 from io import BytesIO
 import os
 from pathlib import Path
+import shutil
 import subprocess
 from subprocess import CompletedProcess
 import sys
-from typing import Any, Callable, IO, Optional, Union
+from typing import Any, Callable, IO, NamedTuple, Optional, Union
 
 from _pytest.monkeypatch import MonkeyPatch
 from bottle import HTTPResponse
 from click.testing import CliRunner, Result
+import humanize
 import pytest
 
 # This file is in a subdirectory, so add the CUT's location to the path
@@ -852,6 +854,40 @@ class TestRelay:
         assert "unlink" not in (i[0] for i in calls)
         assert request.content_length == bytes_read[0]
         assert request.content_length == bytes_written[0]
+
+    @staticmethod
+    def test_get_disk_utilization_str(monkeypatch: MonkeyPatch):
+        """Exercise get_disk_utilization_str()
+
+        This is a (nearly) trivial function, but we test it so that the unit
+        tests show 100% coverage of the CUT.
+        """
+
+        class DiskUsageData(NamedTuple):
+            total: int = 5 * 1024 * 1024 * 1024
+            used: int = 2 * 1024 * 1024 * 1024
+            free: int = 3 * 1024 * 1024 * 1024
+
+        expected_dir_path = Path("/mockdir")
+        du = DiskUsageData()
+
+        def mock_disk_usage(dir_path: Path) -> DiskUsageData:
+            """Mock shutil.disk_usage()"""
+            assert dir_path == expected_dir_path
+            return du
+
+        def mock_naturalsize(value: Union[float, str], *args):
+            """Mock humanize.naturalsize()"""
+            assert len(args) == 0
+            assert str(value) == str(du.free)
+            return "3.2 GB"
+
+        with monkeypatch.context() as m:
+            m.setattr(shutil, "disk_usage", mock_disk_usage)
+            m.setattr(humanize, "naturalsize", mock_naturalsize)
+            expected = "40.0% full, 3.2 GB remaining"
+            actual = relay.get_disk_utilization_str(expected_dir_path)
+            assert actual == expected
 
     @staticmethod
     @pytest.mark.parametrize(
