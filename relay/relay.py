@@ -264,6 +264,9 @@ def receive_file(context: click.Context, file_id: str) -> HTTPResponse:
                 rv.status_line,
                 rv.body,
             )
+        # NOTE:  we are returning directly to the caller from within the
+        # `finally` block here -- this will cause any exception raised in
+        # the `try` block to be dropped...which is exactly what we want.
         return rv
 
 
