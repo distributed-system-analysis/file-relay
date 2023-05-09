@@ -1,0 +1,6 @@
+[flake8]
+doctests = True
+filename = *.py
+exclude = .venv,.git,.tox,dist,doc,*lib/python*,*egg,build,*web-server/*,
+ignore = E121,E123,E126,E203,E226,E501,W503,E704
+max-line-length = 88
