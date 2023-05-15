@@ -1,6 +1,7 @@
 # file-relay
 
 Simple HTTP-based ad-hoc file relay utility with a RESTful interface
+
 [![Build status](https://github.com/distributed-system-analysis/file-relay/actions/workflows/ci.yml/badge.svg)](https://github.com/distributed-system-analysis/file-relay/actions/workflows/ci.yml)
 [![Unit test code coverage](https://badgen.net/codecov/c/github/distributed-system-analysis/file-relay)](https://codecov.io/gh/distributed-system-analysis/file-relay)
 
