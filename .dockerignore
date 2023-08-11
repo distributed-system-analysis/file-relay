@@ -1,0 +1,8 @@
+# Exclude everything but the listed exceptions.
+*
+!.git
+!LICENSE
+!pyproject.toml
+!README.md
+!relay
+!setup.*
