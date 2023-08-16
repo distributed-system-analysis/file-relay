@@ -297,7 +297,9 @@ def delete_file(context: click.Context, file_id: str) -> HTTPResponse:
     return HTTPResponse(status=HTTPStatus.OK, body="Success")
 
 
-@click.command()
+@click.command(
+    epilog="See https://github.com/distributed-system-analysis/file-relay#file-relay for more information."
+)
 @click.option(
     "--server_id",
     prompt=True,
@@ -306,7 +308,6 @@ def delete_file(context: click.Context, file_id: str) -> HTTPResponse:
 )
 @click.option(
     "--bind",
-    prompt=True,
     required=True,
     default=DEFAULT_ADDRESS + ":" + str(DEFAULT_PORT),
     show_default=True,
@@ -328,7 +329,9 @@ def delete_file(context: click.Context, file_id: str) -> HTTPResponse:
 )
 @click.pass_context
 def main(context, server_id, bind, files_directory, debug) -> None:
-    """The main function for the relay micro-server
+    """An ad-hoc web server with a simple RESTful interface for transferring files between two clients
+    \f
+    The main function for the `relay` micro-server
 
     Using the Click support, we parse the command line, extract the
     configuration information, store some of it in the Click context, and start
