@@ -7,7 +7,6 @@ from pathlib import Path
 import shutil
 import subprocess
 from subprocess import CompletedProcess
-import sys
 from typing import Any, Callable, IO, NamedTuple, Optional, Union
 
 from _pytest.monkeypatch import MonkeyPatch
@@ -16,9 +15,7 @@ from click.testing import CliRunner, Result
 import humanize
 import pytest
 
-# This file is in a subdirectory, so add the CUT's location to the path
-sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-from relay import relay  # noqa E402
+from relay import relay
 
 
 def mock_app_stub(
