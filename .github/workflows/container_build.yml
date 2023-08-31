@@ -1,15 +1,15 @@
 name: Create and publish a Docker image
 
-# Configure this workflow to run every time a change is pushed to a branch
-# whose name starts with `release/` or any time a tag is created; this workflow
-# is also run any time a GitHub release is created or updated ("unpublish" and
-# deletions do not cause it to run).
+# Configure this workflow to run every time a change is pushed to the main
+# branch or any branch whose name starts with `release/` or any time a tag is
+# created; this workflow is also run any time a GitHub release is published.
+# The image will be given a tag which is based on the trigger.
 on:
   push:
-    branches: ['release/**']
+    branches: [main, 'release/**']
     tags: ['*']
   release:
-    types: [created, edited, prereleased, published, released]
+    types: [published]
 
 # Set up the container image specification to be `quay.io/pbench/file-relay`.
 env:
