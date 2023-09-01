@@ -24,7 +24,7 @@ ExecStart=/usr/bin/podman run \
 	--network host \
 	--volume /srv/RELAY:/srv/RELAY:Z \
 	quay.io/pbench/file-relay:v0.1.0 \
-	--server_id RELAY --bind 10.1.170.231:8002 --files-directory /srv/RELAY
+	--server_id RELAY --bind :8002 --files-directory /srv/RELAY
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
