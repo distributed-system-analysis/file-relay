@@ -6,7 +6,6 @@ import logging
 import os
 from pathlib import Path
 import shutil
-import subprocess
 from typing import Callable
 
 from bottle import Bottle, HTTPResponse, request, static_file
@@ -103,20 +102,10 @@ def relay_status(context: click.Context) -> HTTPResponse:
 
     Returns:
         An HTTP response with a status of OK and a JSON payload containing
-        status information (currently, the output from `ls` listing the files
-        in the upload directory).
+        status information.
     """
     logging.info("request to report status")
     body = {"disk utilization": get_disk_utilization_str(context.meta[CTX_DIRECTORY])}
-
-    cp = subprocess.run(
-        ["ls", "-l"], cwd=context.meta[CTX_DIRECTORY], capture_output=True, text=True
-    )
-    if cp.returncode:
-        body["error"] = cp.stderr.strip()
-    else:
-        body["files"] = cp.stdout.strip().split("\n")
-
     return HTTPResponse(status=HTTPStatus.OK, body=body)
 
 
