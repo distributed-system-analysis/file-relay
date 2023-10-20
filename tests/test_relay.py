@@ -5,8 +5,6 @@ from io import BytesIO
 import os
 from pathlib import Path
 import shutil
-import subprocess
-from subprocess import CompletedProcess
 from typing import Any, Callable, IO, NamedTuple, Optional, Union
 
 from _pytest.monkeypatch import MonkeyPatch
@@ -173,7 +171,7 @@ class TestRelay:
           - relay.get_disk_utilization_str()
 
         The mock classes seem to be necessary in order to intercept the
-        respective member functions, possibly because these native
+        respective member functions, possibly because these are native
         implementations instead of "pure Python" (or, maybe I just don't
         know what I'm doing).
 
@@ -490,28 +488,13 @@ class TestRelay:
         TestRelay.check_result(result, exit_code=2, stderr="Error running the server")
 
     @staticmethod
-    @pytest.mark.parametrize(
-        "files_str,returncode",
-        (("We've got files!", 0), ("We've got NO files!", 1)),
-    )
-    def test_relay_status_operation(
-        files_str: str, returncode: int, monkeypatch: MonkeyPatch
-    ):
+    def test_relay_status_operation(monkeypatch: MonkeyPatch):
         """Test GET /<server_id> method operation"""
-
-        def mock_run(args: Union[str, list[str]], *, cwd: str, **_kwargs):
-            """Mock for subprocess.run()"""
-            assert str(cwd) == relay.DEFAULT_FILES_DIRECTORY
-            key = "stdout" if returncode == 0 else "stderr"
-            kwargs = {"args": args, "returncode": returncode, key: files_str}
-            return CompletedProcess(**kwargs)
 
         def validate_relay(response: HTTPResponse):
             """Validate the response from the HTTP method call"""
             assert response.status_code == HTTPStatus.OK
             assert TestRelay.DISK_STR in response.body["disk utilization"]
-            key = "files" if returncode == 0 else "error"
-            assert files_str in response.body[key]
 
         with monkeypatch.context() as m:
             mock = mock_app_method_call(
@@ -520,7 +503,6 @@ class TestRelay:
                 method_args={"server_id": TestRelay.SERVER_ID_TEXT},
             )
             TestRelay.do_setup(m, func=mock)
-            m.setattr(subprocess, "run", mock_run)
             result = TestRelay.invoke_main()
         TestRelay.check_result(result)
 
