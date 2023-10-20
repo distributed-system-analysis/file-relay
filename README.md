@@ -33,11 +33,8 @@ This utility currently offers five methods:
 - `GET /<server_id>`: return server status
 - `DELETE /<server_id>`: request server shutdown
 
-There are a number of tweaks which are expected to be added:
-- The hash algorithm for resource names may be changed or made configurable
-- The underlying web server may be changed from the reference one to Gunicorn or other
-- The web server should be made able to accept SSL connections
-- The utility needs to be packaged, either as a Python package or a container (or both)
-- Figure out what the server status response _should_ contain -- currently, it provides
-a list of the available files, which undermines the "ya gotta know it's there" story.
-
+There are a number of tweaks which should be considered:
+- Change the hash algorithm for resource names or make it configurable
+- Change the underlying web server from the reference one to Gunicorn or other
+- Make the web server able to accept SSL connections or place it behind a
+suitably-configured proxy inside the container.

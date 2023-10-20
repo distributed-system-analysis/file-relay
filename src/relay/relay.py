@@ -6,7 +6,6 @@ import logging
 import os
 from pathlib import Path
 import shutil
-import subprocess
 from typing import Callable
 
 from bottle import Bottle, HTTPResponse, request, static_file
@@ -30,12 +29,16 @@ logging.basicConfig(format="[%(levelname)s] relay: %(message)s", level=logging.D
 app = Bottle()
 
 
-def get_disk_utilization_str(dir_path: Path) -> str:
+def get_disk_utilization(dir_path: Path) -> dict[str, int | str]:
     usage = shutil.disk_usage(dir_path)
-    return "{:.3}% full, {} remaining".format(
-        float(usage.used) / float(usage.total) * 100.0,
-        humanize.naturalsize(usage.free),
-    )
+    return {
+        "bytes_used": usage.used,
+        "bytes_remaining": usage.free,
+        "string": "{:.3}% full, {} remaining".format(
+            float(usage.used) / float(usage.total) * 100.0,
+            humanize.naturalsize(usage.free),
+        ),
+    }
 
 
 def validate_server_id(func: Callable) -> Callable:
@@ -103,20 +106,10 @@ def relay_status(context: click.Context) -> HTTPResponse:
 
     Returns:
         An HTTP response with a status of OK and a JSON payload containing
-        status information (currently, the output from `ls` listing the files
-        in the upload directory).
+        status information.
     """
     logging.info("request to report status")
-    body = {"disk utilization": get_disk_utilization_str(context.meta[CTX_DIRECTORY])}
-
-    cp = subprocess.run(
-        ["ls", "-l"], cwd=context.meta[CTX_DIRECTORY], capture_output=True, text=True
-    )
-    if cp.returncode:
-        body["error"] = cp.stderr.strip()
-    else:
-        body["files"] = cp.stdout.strip().split("\n")
-
+    body = {"disk utilization": get_disk_utilization(context.meta[CTX_DIRECTORY])}
     return HTTPResponse(status=HTTPStatus.OK, body=body)
 
 
@@ -182,7 +175,7 @@ def receive_file(context: click.Context, file_id: str) -> HTTPResponse:
     logging.info(
         'request to upload file id "%s", disk %s',
         file_id,
-        get_disk_utilization_str(context.meta[CTX_DIRECTORY]),
+        get_disk_utilization(context.meta[CTX_DIRECTORY])["string"],
     )
 
     if not 0 < request.content_length <= FILE_MAX_SIZE:
@@ -255,7 +248,7 @@ def receive_file(context: click.Context, file_id: str) -> HTTPResponse:
             logging.info(
                 'file id "%s" uploaded successfully, disk %s',
                 file_id,
-                get_disk_utilization_str(context.meta[CTX_DIRECTORY]),
+                get_disk_utilization(context.meta[CTX_DIRECTORY])["string"],
             )
         else:
             logging.info(
