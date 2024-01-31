@@ -40,7 +40,7 @@ jobs:
         # Always run this step, even when there are test failures
         if: ${{ always() }}
       - name: Upload coverage to https://codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
 
 # See https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 #
