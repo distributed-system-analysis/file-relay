@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.12
 LABEL org.opencontainers.image.authors="Pbench Maintainers <pbench@googlegroups.com>"
 
 ENTRYPOINT ["relay"]
