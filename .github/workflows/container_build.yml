@@ -51,7 +51,7 @@ jobs:
       # files found in the root of the Git checkout.  If the build succeeds,
       # the image is pushed to the registry indicated by the tags.
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
